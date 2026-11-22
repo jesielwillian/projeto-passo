@@ -1,0 +1,18 @@
+VARIACOES DE CORES — PASSO
+
+Cada produto já usa a imagem principal existente como primeira cor.
+Para adicionar a segunda e a terceira variação, salve as imagens geradas com estes nomes:
+
+tenis-01-cor-2.webp / tenis-01-cor-3.webp
+tenis-02-cor-2.webp / tenis-02-cor-3.webp
+...
+tenis-08-cor-2.webp / tenis-08-cor-3.webp
+
+Coloque todos os arquivos nesta pasta: assets/images/produtos/variacoes/
+
+A primeira bolinha mantém a imagem principal atual (assets/images/produtos/tenis-XX.webp).
+As outras duas bolinhas carregam os arquivos acima. Se uma imagem ainda não existir,
+o sistema volta automaticamente para a imagem principal, sem quebrar o card.
+
+As cores e os nomes/tons das bolinhas são configurados no array `colors` de cada produto
+em assets/js/app.js. A ordem das imagens corresponde à ordem dessas três cores.

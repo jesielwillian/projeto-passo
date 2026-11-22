@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07100f">
+  <meta name="description" content="Painel administrativo da loja Passo Labs.">
+  <title>Passo Labs · Administração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <div class="login-screen" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <a class="brand" href="/"><span class="brand-mark"><i class="fa-solid fa-arrow-right"></i></span> passo<span class="dot">.</span></a>
+      <span class="eyebrow">PASSO LABS / ÁREA RESTRITA</span>
+      <h1>Seu negócio.<br>Seu controle.</h1>
+      <p>Acesse o centro de gestão da loja para acompanhar pedidos, produtos e operação.</p>
+      <label for="email">E-mail de acesso</label>
+      <input id="email" type="email" autocomplete="username" placeholder="admin@sualoja.com.br" required>
+      <label for="password">Senha</label>
+      <div class="password-field">
+        <input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        <button class="password-toggle" id="passwordToggle" type="button" aria-label="Segure para visualizar a senha" aria-pressed="false" title="Segure para visualizar a senha">
+          <i class="fa-regular fa-eye" aria-hidden="true"></i>
+        </button>
+      </div>
+      <button class="btn btn-dark" type="submit">Acessar painel <i class="fa-solid fa-arrow-right"></i></button>
+      <p class="form-error" id="loginError" role="alert"></p>
+      <small><i class="fa-solid fa-shield-halved"></i> Acesso protegido pelo Supabase Auth</small>
+    </form>
+  </div>
+
+  <div class="app" id="app" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark"><i class="fa-solid fa-arrow-right"></i></span> passo<span class="dot">.</span></a>
+      <span class="eyebrow nav-label">CENTRAL DE OPERAÇÕES</span>
+      <nav aria-label="Navegação administrativa">
+        <button class="nav-item active" data-view="overview"><i class="fa-solid fa-grid-2"></i> Visão geral</button>
+        <button class="nav-item" data-view="products"><i class="fa-solid fa-box-open"></i> Produtos</button>
+        <button class="nav-item" data-view="messages"><i class="fa-regular fa-envelope"></i> Mensagens <span class="nav-count" id="messageCount">0</span></button>
+        <button class="nav-item" data-view="orders"><i class="fa-solid fa-receipt"></i> Pedidos</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user-chip"><span class="avatar">P</span><div><strong id="adminEmail">Administrador</strong><small>Conta com acesso autorizado</small></div></div>
+        <button id="logoutBtn" class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Encerrar sessão</button>
+        <a class="back-store" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir loja</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><span class="eyebrow" id="pageEyebrow">PASSO LABS / DASHBOARD</span><h1 id="pageTitle">Visão geral</h1></div>
+        <div class="top-actions"><span class="live"><i></i> Painel conectado</span><button class="icon-button" id="refreshBtn" type="button" title="Atualizar dados" aria-label="Atualizar dados"><i class="fa-solid fa-arrows-rotate"></i></button></div>
+      </header>
+
+      <section class="view active" id="overviewView">
+        <div class="welcome">
+          <div class="welcome-copy"><span class="eyebrow">PASSO LABS / COMANDO CENTRAL</span><h2>Move your business.<br><em>Beyond limits.</em></h2><p>Uma visão clara da sua operação para decidir o próximo passo.</p></div>
+          <div class="welcome-symbol" aria-hidden="true">p<i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span>Produtos ativos</span><i class="fa-solid fa-box"></i><strong id="statProducts">—</strong><small>itens disponíveis no catálogo</small></article>
+          <article class="stat-card"><span>Pedidos registrados</span><i class="fa-solid fa-bag-shopping"></i><strong id="statOrders">—</strong><small>pedidos na base de dados</small></article>
+          <article class="stat-card"><span>Pedidos pagos</span><i class="fa-solid fa-circle-check"></i><strong id="statPaid">—</strong><small>pagamentos confirmados</small></article>
+          <article class="stat-card highlight"><span>Receita registrada</span><i class="fa-solid fa-chart-line"></i><strong id="statRevenue">R$ —</strong><small>total de pedidos pagos</small></article>
+        </div>
+        <div class="overview-grid">
+          <section class="panel"><div class="panel-head"><div><span class="eyebrow">ÚLTIMAS ATIVIDADES</span><h3>Pedidos recentes</h3></div><button class="text-button" data-goto="orders">Ver todos <i class="fa-solid fa-arrow-right"></i></button></div><div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead><tbody id="recentOrders"><tr><td colspan="5" class="empty">Carregando dados…</td></tr></tbody></table></div></section>
+          <section class="panel"><div class="panel-head"><div><span class="eyebrow">ACOMPANHAMENTO</span><h3>Status da operação</h3></div></div><div class="operation-list"><div class="operation-item"><span class="operation-label"><span class="operation-icon"><i class="fa-regular fa-clock"></i></span> Aguardando pagamento</span><strong id="countPending">0</strong></div><div class="operation-item"><span class="operation-label"><span class="operation-icon"><i class="fa-solid fa-box"></i></span> Em preparação</span><strong id="countProcessing">0</strong></div><div class="operation-item"><span class="operation-label"><span class="operation-icon"><i class="fa-solid fa-truck-fast"></i></span> Enviados</span><strong id="countShipped">0</strong></div><div class="operation-item"><span class="operation-label"><span class="operation-icon"><i class="fa-solid fa-circle-check"></i></span> Entregues</span><strong id="countDelivered">0</strong></div></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="productsView">
+        <div class="toolbar"><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="productSearch" type="search" placeholder="Buscar por nome ou categoria" autocomplete="off"></div><button class="btn btn-dark" id="newProduct" type="button"><i class="fa-solid fa-plus"></i> Adicionar produto</button></div>
+        <div class="panel products-panel"><div class="panel-head"><div><span class="eyebrow">GESTÃO DE CATÁLOGO</span><h3>Seus produtos</h3></div><span class="catalog-total" id="productTotal">— itens</span></div><div class="product-cards" id="productsTable"><div class="empty">Carregando produtos…</div></div></div>
+      </section>
+
+      <section class="view" id="messagesView">
+        <div class="toolbar"><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="messageSearch" type="search" placeholder="Buscar por nome, e-mail ou assunto" autocomplete="off"></div><select id="messageFilter" aria-label="Filtrar mensagens"><option value="all">Todas as mensagens</option><option value="new">Não respondidas</option><option value="replied">Respondidas</option></select></div>
+        <div class="messages-layout"><div class="panel inbox-panel"><div class="panel-head"><div><span class="eyebrow">CONTATO / ATENDIMENTO</span><h3>Caixa de entrada</h3></div></div><div id="messagesList" class="messages-list"><div class="empty">Carregando mensagens…</div></div></div><div class="panel message-detail" id="messageDetail"><div class="message-placeholder"><i class="fa-regular fa-envelope-open"></i><h3>Selecione uma mensagem</h3><p>Abra uma conversa para ler e responder ao cliente.</p></div></div></div>
+      </section>
+
+      <section class="view" id="ordersView">
+        <div class="toolbar"><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="orderSearch" type="search" placeholder="Buscar pedido ou cliente" autocomplete="off"></div><select id="orderFilter" aria-label="Filtrar pedidos"><option value="all">Todos os status</option><option value="pending">Pendente</option><option value="paid">Pago</option><option value="processing">Em preparação</option><option value="shipped">Enviado</option><option value="delivered">Entregue</option><option value="cancelled">Cancelado</option></select></div>
+        <div class="panel"><div class="panel-head"><div><span class="eyebrow">VENDAS / FULFILLMENT</span><h3>Todos os pedidos</h3></div></div><div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th><th>Atualizar status</th></tr></thead><tbody id="ordersTable"><tr><td colspan="6" class="empty">Carregando pedidos…</td></tr></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="productDialog"><form method="dialog" class="product-form" id="productForm"><div class="dialog-head"><div><span class="eyebrow">CATÁLOGO / PRODUTOS</span><h2 id="dialogTitle">Novo produto</h2></div><button class="icon-button" value="cancel" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div><input type="hidden" id="productId"><label>Nome do produto<input id="pName" required maxlength="120"></label><label>Categoria<input id="pCategory" required maxlength="80"></label><div class="form-row"><label>Preço (R$)<div class="stock-stepper price-stepper"><button type="button" class="stock-step-button" data-price-step="-1" aria-label="Diminuir preço"><i class="fa-solid fa-minus"></i></button><input id="pPrice" type="number" min="0" step="0.01" inputmode="decimal" required><button type="button" class="stock-step-button" data-price-step="1" aria-label="Aumentar preço"><i class="fa-solid fa-plus"></i></button></div></label><label>Estoque disponível<div class="stock-stepper"><button type="button" class="stock-step-button" data-stock-step="-1" aria-label="Diminuir estoque"><i class="fa-solid fa-minus"></i></button><input id="pStock" type="number" min="0" step="1" value="0" inputmode="numeric" required><button type="button" class="stock-step-button" data-stock-step="1" aria-label="Aumentar estoque"><i class="fa-solid fa-plus"></i></button></div></label></div><div class="image-field"><span class="image-field-label">Imagem do produto</span><input id="pImage" type="hidden"><input id="pImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/avif" hidden><div class="image-picker" id="imagePicker"><div class="image-preview" id="imagePreview"><i class="fa-regular fa-image"></i></div><div class="image-picker-copy"><strong id="imagePickerTitle">Escolher imagem</strong><span id="imagePickerHint">PNG, JPG, WEBP ou AVIF · até 5 MB</span><div class="image-picker-actions"><button type="button" class="btn btn-light" id="chooseProductImage"><i class="fa-solid fa-upload"></i> Selecionar arquivo</button><button type="button" class="image-remove" id="removeProductImage" hidden>Remover</button></div></div></div></div><label class="check"><input id="pActive" type="checkbox" checked> Produto ativo na loja</label><p class="form-error" id="productError" role="alert"></p><div class="dialog-actions"><button class="btn btn-light" value="cancel">Cancelar</button><button class="btn btn-dark" id="saveProduct" type="button">Salvar produto <i class="fa-solid fa-arrow-right"></i></button></div></form></dialog>
+
+  <div class="admin-toast-region" id="adminToast" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/admin/admin-config.js"></script>
+  <script src="/assets/js/custom-select.js"></script>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (() => {
+      const password = document.getElementById('password');
+      const toggle = document.getElementById('passwordToggle');
+      if (!password || !toggle) return;
+
+      const icon = toggle.querySelector('i');
+      const showPassword = () => {
+        password.type = 'text';
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.setAttribute('aria-label', 'Solte para ocultar a senha');
+        toggle.title = 'Solte para ocultar a senha';
+        icon.className = 'fa-regular fa-eye-slash';
+      };
+      const hidePassword = () => {
+        password.type = 'password';
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.setAttribute('aria-label', 'Segure para visualizar a senha');
+        toggle.title = 'Segure para visualizar a senha';
+        icon.className = 'fa-regular fa-eye';
+      };
+
+      toggle.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        showPassword();
+        toggle.setPointerCapture?.(event.pointerId);
+      });
+      ['pointerup', 'pointercancel', 'lostpointercapture', 'pointerleave'].forEach((eventName) => {
+        toggle.addEventListener(eventName, hidePassword);
+      });
+      toggle.addEventListener('keydown', (event) => {
+        if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) {
+          event.preventDefault();
+          showPassword();
+        }
+      });
+      toggle.addEventListener('keyup', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') hidePassword();
+      });
+      toggle.addEventListener('blur', hidePassword);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) hidePassword();
+      });
+    })();
+  </script>
+</body>
+</html>
